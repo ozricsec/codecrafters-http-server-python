@@ -16,21 +16,19 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
             if path == "/":
                 await writer.write("HTTP/1.1 200 OK\r\n\r\n")
 			if path.split("/")[1] == "echo":
-				body = path.split("/")[-1]
-				await writer.write(f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(body)}\r\n\r\n{body}")
-			if path.split("/")[1] == "user-agent":
-				ua = headers[2][12:]
-				await writer.write(f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(ua)}\r\n\r\n{ua}")
-			else:
-				await writer.write("HTTP/1.1 404 Not Found\r\n\r\n")
+                body = path.split("/")[-1]
+                await writer.write(f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(body)}\r\n\r\n{body}")
+            if path.split("/")[1] == "user-agent":
+                ua = headers[2][12:]
+                await writer.write(f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(ua)}\r\n\r\n{ua}")
+            else:
+                await writer.write("HTTP/1.1 404 Not Found\r\n\r\n")
             await writer.drain()
-		except (asyncio.IncompleteReadError, ConnectionResetError):
-			pass
-		finally:
-			writer.close()
-			await writer.wait_closed()
-
-
+    except (asyncio.IncompleteReadError, ConnectionResetError):
+        pass
+    finally:
+        writer.close()
+        await writer.wait_closed()
 
 async def main():
     server = await asyncio.start_server(
