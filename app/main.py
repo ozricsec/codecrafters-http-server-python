@@ -83,15 +83,13 @@ def handle_404(writer: asyncio.StreamWriter) -> None:
 
 async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
     try:
+        keep_alive = True
         while True:
             byte_data = await reader.read(4096)
+            if not byte_data:
+                break
             data = byte_data.decode("utf-8")
-
-            if not data:
-                writer.close()
-                await writer.wait_closed()
-                return
-
+            
             method, path, headers, body = parse_request(data)
 
             parts = path.strip("/").split("/")
@@ -131,7 +129,7 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
             
             connection = headers.get("connection", "").lower()
             if connection == "close":
-                break
+                keep_alive = False
 
     except (asyncio.IncompleteReadError, ConnectionResetError):
         pass
