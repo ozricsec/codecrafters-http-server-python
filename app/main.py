@@ -102,8 +102,8 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
 
             # Routing
             if path == "/":
-                if "close" in headers["connection"]:
-                    keep_alive = False
+                connection = headers.get("connection", "").lower()
+                keep_alive = connection != "close"
                 handle_root(keep_alive, writer)
 
             elif parts[0] == "echo" and len(parts) > 1:
@@ -135,9 +135,6 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
 
             await writer.drain()
             
-            connection = headers.get("connection", "").lower()
-            if connection == "close":
-                keep_alive = False
 
     except (asyncio.IncompleteReadError, ConnectionResetError):
         pass
