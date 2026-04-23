@@ -12,7 +12,7 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
             if not data:
                 break
             path = data.split(b" ")[1]
-            headers = data.split("\r\n")
+            headers = data.split(b"\r\n")
             if path == "/":
                 await writer.write("HTTP/1.1 200 OK\r\n\r\n")
             if path.split(b"/")[1] == "echo":
