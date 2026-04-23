@@ -46,8 +46,17 @@ def handle_files(filename: str, writer: asyncio.StreamWriter) -> None:
         content
     )
     writer.write(response)
-        
-            
+    
+def handle_post_files(filename: str, writer: asyncio.StreamWriter) -> None:
+    file_path = Path(sys.argv[2]) / filename
+
+    with open(file_path, "w") as f:
+        f.write(filename)
+
+    response = (
+        b"HTTP/1.1 201 Created\r\n\r\n"
+    )
+    writer.write(response)
 
 
 def handle_404(writer: asyncio.StreamWriter) -> None:
@@ -74,9 +83,12 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
             handle_echo(path, writer)
         elif path.split("/")[1] == "user-agent":
             handle_user_agent(headers, writer)
-        elif path.split("/")[1] == "files":
+        elif path.split("/")[1] == "files" and data.split(" ")[0] == "GET":
             file_path = Path(sys.argv[2]) / path.split("/")[2]
             handle_files(path.split("/")[2], writer) if file_path.exists() else handle_404(writer)
+        elif path.split("/")[1] == "files" and data.split(" ")[0] == "POST"
+            file_path = Path(sys.argv[2]) / path.split("/")[2]
+            handle_post_files(filename, writer)
         else:
             handle_404(writer)
 
