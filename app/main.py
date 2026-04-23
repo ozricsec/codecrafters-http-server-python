@@ -47,11 +47,11 @@ def handle_files(filename: str, writer: asyncio.StreamWriter) -> None:
     )
     writer.write(response)
     
-def handle_post_files(filename: str, writer: asyncio.StreamWriter) -> None:
+def handle_post_files(filename: str, post_data: str, writer: asyncio.StreamWriter) -> None:
     file_path = Path(sys.argv[2]) / filename
 
     with open(file_path, "w") as f:
-        f.write(filename)
+        f.write(post_data)
 
     response = (
         b"HTTP/1.1 201 Created\r\n\r\n"
@@ -88,7 +88,8 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
             handle_files(path.split("/")[2], writer) if file_path.exists() else handle_404(writer)
         elif path.split("/")[1] == "files" and data.split(" ")[0] == "POST":
             file_path = Path(sys.argv[2]) / path.split("/")[2]
-            handle_post_files(path.split("/")[2], writer)
+            print(headers)
+            handle_post_files(path.split("/")[2], , writer)
         else:
             handle_404(writer)
 
