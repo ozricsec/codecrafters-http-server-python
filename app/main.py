@@ -16,7 +16,7 @@ def main():
             body = path.split("/")[-1]
             client.send(f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(body)}\r\n\r\n{body}".encode())
         if path.split("/")[1] == "user-agent":
-            print(path)
+            print(body)
         else:
             client.send("HTTP/1.1 404 Not Found\r\n\r\n".encode())
     
