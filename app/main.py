@@ -35,8 +35,9 @@ def handle_echo(path: str, encoding: bool, writer: asyncio.StreamWriter) -> None
         b"Content-Type: text/plain\r\n"
     )
     if encoding:
-        response += b"Content-Encoding: gzip\r\n"
-    response += b"Content-Length: " + str(len(body)).encode() + b"\r\n\r\n" + body.encode()
+        response += b"Content-Encoding: gzip\r\nContent-Length: " + str(len(body)).encode() + b"\r\n\r\n" + body.encode('utf-8')
+    else:
+        response += b"Content-Length: " + str(len(body)).encode() + b"\r\n\r\n" + body.encode()
     writer.write(response)
 
 
@@ -98,9 +99,10 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
             handle_root(writer)
 
         elif parts[0] == "echo" and len(parts) > 1:
-            accept_encoding = headers.get("accept-encoding", "")
-            use_gzip = "gzip" in accept_encoding
-            handle_echo(path, use_gzip, writer)
+            elif parts[0] == "echo" and len(parts) > 1:
+                accept_encoding = headers.get("accept-encoding", "")
+                use_gzip = "gzip" in accept_encoding
+                handle_echo(path, use_gzip, writer)
 
         elif parts[0] == "user-agent":
             handle_user_agent(headers, writer)
