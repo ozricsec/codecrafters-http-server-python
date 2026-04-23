@@ -29,7 +29,7 @@ def handle_root(alive: bool, writer: asyncio.StreamWriter) -> None:
     if  not alive:
         writer.write(b"HTTP/1.1 200 OK\r\n\r\nConnection: close")
     else:
-        writer.write(b"HTTP/1.1 200 OK\r\n\r\n")
+        writer.write(b"HTTP/1.1 200 OK\r\n\r\nConnection: keep-alive")
 
 
 def handle_echo(path: str, encoding: bool, writer: asyncio.StreamWriter) -> None:
