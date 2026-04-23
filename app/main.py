@@ -83,50 +83,55 @@ def handle_404(writer: asyncio.StreamWriter) -> None:
 
 async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
     try:
-        byte_data = await reader.read(4096)
-        data = byte_data.decode("utf-8")
+        while True:
+            byte_data = await reader.read(4096)
+            data = byte_data.decode("utf-8")
 
-        if not data:
-            writer.close()
-            await writer.wait_closed()
-            return
+            if not data:
+                writer.close()
+                await writer.wait_closed()
+                return
 
-        method, path, headers, body = parse_request(data)
+            method, path, headers, body = parse_request(data)
 
-        parts = path.strip("/").split("/")
+            parts = path.strip("/").split("/")
 
-        # Routing
-        if path == "/":
-            handle_root(writer)
+            # Routing
+            if path == "/":
+                handle_root(writer)
 
-        elif parts[0] == "echo" and len(parts) > 1:
-            accept_encoding = headers.get("accept-encoding", "")
-            use_gzip = "gzip" in accept_encoding
-            handle_echo(path, use_gzip, writer)
+            elif parts[0] == "echo" and len(parts) > 1:
+                accept_encoding = headers.get("accept-encoding", "")
+                use_gzip = "gzip" in accept_encoding
+                handle_echo(path, use_gzip, writer)
 
-        elif parts[0] == "user-agent":
-            handle_user_agent(headers, writer)
+            elif parts[0] == "user-agent":
+                handle_user_agent(headers, writer)
 
-        elif parts[0] == "files" and len(parts) > 1:
-            filename = parts[1]
-            file_path = Path(sys.argv[2]) / filename
+            elif parts[0] == "files" and len(parts) > 1:
+                filename = parts[1]
+                file_path = Path(sys.argv[2]) / filename
 
-            if method == "GET":
-                if file_path.exists():
-                    handle_files(filename, writer)
+                if method == "GET":
+                    if file_path.exists():
+                        handle_files(filename, writer)
+                    else:
+                        handle_404(writer)
+
+                elif method == "POST":
+                    handle_post_files(filename, body, writer)
+
                 else:
                     handle_404(writer)
-
-            elif method == "POST":
-                handle_post_files(filename, body, writer)
 
             else:
                 handle_404(writer)
 
-        else:
-            handle_404(writer)
-
-        await writer.drain()
+            await writer.drain()
+            
+            connection = headers.get("connection", "").lower()
+            if connection == "close":
+                break
 
     except (asyncio.IncompleteReadError, ConnectionResetError):
         pass
