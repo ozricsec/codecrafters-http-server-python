@@ -102,7 +102,8 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
 
             # Routing
             if path == "/":
-                print(headers)
+                if "close" in headers["connection"]:
+                    keep_alive = False
                 handle_root(keep_alive, writer)
 
             elif parts[0] == "echo" and len(parts) > 1:
