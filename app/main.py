@@ -8,7 +8,8 @@ PORT = 4221
 async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
     try:
         while True:
-            data = str(await reader.read(4096))
+            byte_data = await reader.read(4096)
+            data = byte_data.decode("utf-8")
             if not data:
                 break
             print(data)
