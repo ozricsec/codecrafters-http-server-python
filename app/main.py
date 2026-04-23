@@ -8,7 +8,7 @@ def main():
         client, _ = server_socket.accept()
         
         data = client.recv(4096).decode("utf-8")
-        print(data.split(" ")
+        print(data.split(" "))
         path = data.split(" ")[1]
         print(path)
         
