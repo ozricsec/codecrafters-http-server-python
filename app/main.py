@@ -88,7 +88,7 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
             handle_files(path.split("/")[2], writer) if file_path.exists() else handle_404(writer)
         elif path.split("/")[1] == "files" and data.split(" ")[0] == "POST":
             file_path = Path(sys.argv[2]) / path.split("/")[2]
-            handle_post_files(filename, writer)
+            handle_post_files(path.split("/")[2]), writer)
         else:
             handle_404(writer)
 
