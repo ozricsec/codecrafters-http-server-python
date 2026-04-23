@@ -13,8 +13,8 @@ def main():
         if path == "/":
             client.send("HTTP/1.1 200 OK\r\n\r\n".encode())
         if path.split("/")[1] == "echo":
-            body = len(path.split("/")[-1])
-            client.send(f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {body} \r\n\r\n".encode())
+            body = en(path.split("/")[-1]
+            client.send(f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {body}\r\n\r\n".encode())
         else:
             client.send("HTTP/1.1 404 Not Found\r\n\r\n".encode())
     
