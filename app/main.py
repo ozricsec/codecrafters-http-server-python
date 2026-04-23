@@ -36,7 +36,7 @@ def handle_echo(path: str, encoding: bool, writer: asyncio.StreamWriter) -> None
         b"Content-Type: text/plain\r\n"
     )
     if encoding:        
-        response += b"Content-Encoding: gzip\r\nContent-Length: " + str(len(body)).encode() + b"\r\n\r\n" + gzip.compress(body.encode())
+        response += b"Content-Encoding: gzip\r\nContent-Length: " + str(len(body)).encode() + b"\r\n\r\n" + gzip.compress(body)
         print(response)
     else:
         response += b"Content-Length: " + str(len(body)).encode() + b"\r\n\r\n" + body.encode()
