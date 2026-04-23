@@ -99,8 +99,9 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
 
         elif parts[0] == "echo" and len(parts) > 1:
             print(headers)
-            if headers["accept-encoding"].exists() and headers["accept-encoding"] == "gzip":
-                handle_echo(path, True, writer)
+            if "accept-encoding" in headers:
+                if headers["accept-encoding"] == "gzip":
+                    handle_echo(path, True, writer)
             else:
                 handle_echo(path, False, writer)
 
