@@ -7,23 +7,41 @@ HOST = "localhost"
 PORT = 4221
 
 
+def parse_request(data: str):
+    lines = data.split("\r\n")
+    request_line = lines[0]
+    method, path, _ = request_line.split(" ")
+
+    headers = {}
+    i = 1
+    while i < len(lines) and lines[i]:
+        key, value = lines[i].split(":", 1)
+        headers[key.strip().lower()] = value.strip()
+        i += 1
+
+    body = "\r\n".join(lines[i+1:]) if i + 1 < len(lines) else ""
+
+    return method, path, headers, body
+
+
 def handle_root(writer: asyncio.StreamWriter) -> None:
     writer.write(b"HTTP/1.1 200 OK\r\n\r\n")
 
 
-def handle_echo(path: str, writer: asyncio.StreamWriter) -> None:
+def handle_echo(path: str, encoding: bool, writer: asyncio.StreamWriter) -> None:
     body = path.split("/")[-1]
     response = (
         b"HTTP/1.1 200 OK\r\n"
         b"Content-Type: text/plain\r\n"
-        b"Content-Length: " + str(len(body)).encode() + b"\r\n\r\n" +
-        body.encode()
     )
+    if encoding:
+        response += b"Content-Encoding: gzip\r\n"
+    response += b"Content-Length: " + str(len(body)).encode() + b"\r\n\r\n" + body.encode()
     writer.write(response)
 
 
-def handle_user_agent(headers: list[str], writer: asyncio.StreamWriter) -> None:
-    ua = headers[2][12:]
+def handle_user_agent(headers: dict, writer: asyncio.StreamWriter) -> None:
+    ua = headers.get("user-agent", "")
     response = (
         b"HTTP/1.1 200 OK\r\n"
         b"Content-Type: text/plain\r\n"
@@ -31,8 +49,8 @@ def handle_user_agent(headers: list[str], writer: asyncio.StreamWriter) -> None:
         ua.encode()
     )
     writer.write(response)
-    
-    
+
+
 def handle_files(filename: str, writer: asyncio.StreamWriter) -> None:
     file_path = Path(sys.argv[2]) / filename
 
@@ -46,17 +64,15 @@ def handle_files(filename: str, writer: asyncio.StreamWriter) -> None:
         content
     )
     writer.write(response)
-    
-def handle_post_files(filename: str, post_data: str, writer: asyncio.StreamWriter) -> None:
+
+
+def handle_post_files(filename: str, body: str, writer: asyncio.StreamWriter) -> None:
     file_path = Path(sys.argv[2]) / filename
 
     with open(file_path, "w") as f:
-        f.write(post_data)
+        f.write(body)
 
-    response = (
-        b"HTTP/1.1 201 Created\r\n\r\n"
-    )
-    writer.write(response)
+    writer.write(b"HTTP/1.1 201 Created\r\n\r\n")
 
 
 def handle_404(writer: asyncio.StreamWriter) -> None:
@@ -73,22 +89,39 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
             await writer.wait_closed()
             return
 
-        path = data.split(" ")[1]
-        headers = data.split("\r\n")
+        method, path, headers, body = parse_request(data)
+
+        parts = path.strip("/").split("/")
 
         # Routing
         if path == "/":
             handle_root(writer)
-        elif path.split("/")[1] == "echo":
-            handle_echo(path, writer)
-        elif path.split("/")[1] == "user-agent":
+
+        elif parts[0] == "echo" and len(parts) > 1:
+            if "gzip" in headers:
+                handle_echo(path, true, writer)
+            else:
+                handle_echo(path, false, writer)
+
+        elif parts[0] == "user-agent":
             handle_user_agent(headers, writer)
-        elif path.split("/")[1] == "files" and data.split(" ")[0] == "GET":
-            file_path = Path(sys.argv[2]) / path.split("/")[2]
-            handle_files(path.split("/")[2], writer) if file_path.exists() else handle_404(writer)
-        elif path.split("/")[1] == "files" and data.split(" ")[0] == "POST":
-            file_path = Path(sys.argv[2]) / path.split("/")[2]
-            handle_post_files(path.split("/")[2], headers[-1], writer)
+
+        elif parts[0] == "files" and len(parts) > 1:
+            filename = parts[1]
+            file_path = Path(sys.argv[2]) / filename
+
+            if method == "GET":
+                if file_path.exists():
+                    handle_files(filename, writer)
+                else:
+                    handle_404(writer)
+
+            elif method == "POST":
+                handle_post_files(filename, body, writer)
+
+            else:
+                handle_404(writer)
+
         else:
             handle_404(writer)
 
