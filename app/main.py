@@ -71,7 +71,7 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
             handle_echo(path, writer)
         elif path.split("/")[1] == "user-agent":
             handle_user_agent(headers, writer)
-        elif path.split("/")[1] == "files" and Path(f"/{sys.argv[2]}/{path.split('/')[2])}").exists():
+        elif path.split("/")[1] == "files" and Path(f"/{sys.argv[2]}/{path.split('/')[2]}").exists():
             handle_files(file, writer)
         else:
             handle_404(writer)
