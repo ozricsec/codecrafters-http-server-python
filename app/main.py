@@ -15,10 +15,10 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
             headers = data.split("\r\n")
             if path == "/":
                 await writer.write("HTTP/1.1 200 OK\r\n\r\n")
-            if path.split("/")[1] == "echo":
-                body = path.split("/")[-1]
+            if path.split(b"/")[1] == "echo":
+                body = path.split(b"/")[-1]
                 await writer.write(f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(body)}\r\n\r\n{body}")
-            if path.split("/")[1] == "user-agent":
+            if path.split(b"/")[1] == "user-agent":
                 ua = headers[2][12:]
                 await writer.write(f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(ua)}\r\n\r\n{ua}")
             else:
