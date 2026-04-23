@@ -33,16 +33,19 @@ def handle_user_agent(headers: list[str], writer: asyncio.StreamWriter) -> None:
     writer.write(response)
     
     
-def handle_files(file: str, writer: asyncio.StreamWriter) -> None:
-    with open(f"/{sys.argv[2]}/{path[2]}", "r") as file:
-        content = file.read()
-        response = (
+def handle_files(filename: str, writer: asyncio.StreamWriter) -> None:
+    file_path = Path(sys.argv[2]) / filename
+
+    with open(file_path, "rb") as f:
+        content = f.read()
+
+    response = (
         b"HTTP/1.1 200 OK\r\n"
         b"Content-Type: application/octet-stream\r\n"
         b"Content-Length: " + str(len(content)).encode() + b"\r\n\r\n" +
-        content.encode()
+        content
     )
-    writer.write(response)
+    writer.write(response))
         
             
 
@@ -71,8 +74,9 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
             handle_echo(path, writer)
         elif path.split("/")[1] == "user-agent":
             handle_user_agent(headers, writer)
-        elif path.split("/")[1] == "files" and Path(f"/{sys.argv[2]}/{path.split('/')[2]}").exists():
-            handle_files(file, writer)
+        elif path.split("/")[1] == "files":
+            file_path = Path(sys.argv[2]) / path.split("/")[2]
+            handle_files(path.split("/")[2], writer) if file_path.exists() else handle_404(writer)
         else:
             handle_404(writer)
 
