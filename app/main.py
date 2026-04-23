@@ -14,15 +14,15 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
             path = data.split(b" ")[1]
             headers = data.split(b"\r\n")
             if path == "/":
-                await writer.write("HTTP/1.1 200 OK\r\n\r\n")
+                await writer.write(b"HTTP/1.1 200 OK\r\n\r\n")
             if path.split(b"/")[1] == "echo":
                 body = path.split(b"/")[-1]
-                await writer.write(f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(body)}\r\n\r\n{body}")
+                await writer.write(b"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %s\r\n\r\n%s" % (len(body), body))
             if path.split(b"/")[1] == "user-agent":
                 ua = headers[2][12:]
-                await writer.write(f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(ua)}\r\n\r\n{ua}")
+                await writer.write(b"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %s\r\n\r\n%s" % (len(ua), ua))
             else:
-                await writer.write("HTTP/1.1 404 Not Found\r\n\r\n")
+                await writer.write(b"HTTP/1.1 404 Not Found\r\n\r\n")
             await writer.drain()
     except (asyncio.IncompleteReadError, ConnectionResetError):
         pass
