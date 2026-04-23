@@ -1,5 +1,6 @@
 import socket  # noqa: F401
 import asyncio
+import sys
 from pathlib import Path
 
 HOST = "localhost"
