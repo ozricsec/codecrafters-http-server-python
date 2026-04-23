@@ -1,27 +1,31 @@
 [![progress-banner](https://backend.codecrafters.io/progress/http-server/2a2084e6-c7de-4636-a9b5-4be7799b5ba9)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
 
 This is a starting point for Python solutions to the
-["Build Your own Claude Code" Challenge](https://codecrafters.io/challenges/claude-code).
+["Build Your Own HTTP server" Challenge](https://app.codecrafters.io/courses/http-server/overview).
 
-Claude Code is an AI coding assistant that uses Large Language Models (LLMs) to
-understand code and perform actions through tool calls. In this challenge,
-you'll build your own Claude Code from scratch by implementing an LLM-powered
-coding assistant.
+[HTTP](https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol) is the
+protocol that powers the web. In this challenge, you'll build a HTTP/1.1 server
+that is capable of serving multiple clients.
 
-Along the way you'll learn about HTTP RESTful APIs, OpenAI-compatible tool
-calling, agent loop, and how to integrate multiple tools into an AI assistant.
+
+Along the way you'll learn about TCP servers,
+[HTTP request syntax](https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html),
+and more.
 
 **Note**: If you're viewing this repo on GitHub, head over to
 [codecrafters.io](https://codecrafters.io) to try the challenge.
 
 # Passing the first stage
 
-The entry point for your `claude-code` implementation is in `app/main.py`. Study
-and uncomment the relevant code, and submit to pass the first stage:
+The entry point for your HTTP server implementation is in `app/main.py`. Study
+and uncomment the relevant code, and push your changes to pass the first stage:
 
 ```sh
 codecrafters submit
+
 ```
+
+Time to move on to the next stage!
 
 # Stage 2 & beyond
 
