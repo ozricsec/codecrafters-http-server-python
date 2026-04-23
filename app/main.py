@@ -7,24 +7,33 @@ PORT = 4221
 
 async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
     try:
-        while True:
-            byte_data = await reader.read(4096)
-            data = byte_data.decode("utf-8")
-            if not data:
-                break
-            path = data.split(" ")[1]
-            headers = data.split("\r\n")
-            if path == "/":
-                writer.write(b"HTTP/1.1 200 OK\r\n\r\n")
-            if path.split("/")[1] == "echo":
-                body = path.split("/")[-1]
-                writer.write(b"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %s\r\n\r\n%s" % (len(body), body))
-            if path.split("/")[1] == "user-agent":
-                ua = headers[2][12:]
-                writer.write(b"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %s\r\n\r\n%s" % (len(ua), ua))
-            else:
-                writer.write(b"HTTP/1.1 404 Not Found\r\n\r\n")
-            await writer.drain()
+        byte_data = await reader.read(4096)
+        data = byte_data.decode("utf-8")
+        if not data:
+            break
+        path = data.split(" ")[1]
+        headers = data.split("\r\n")
+        if path == "/":
+            writer.write(b"HTTP/1.1 200 OK\r\n\r\n")
+        elif path.split("/")[1] == "echo":
+            body = path.split("/")[-1]
+            writer.write(
+                b"HTTP/1.1 200 OK\r\n"
+                b"Content-Type: text/plain\r\n"
+                b"Content-Length: " + str(len(body)).encode() 
+                b"\r\n\r\n" + body.encode()
+            )
+        elif path.split("/")[1] == "user-agent":
+            ua = headers[2][12:]
+            writer.write(
+                b"HTTP/1.1 200 OK\r\n"
+                b"Content-Type: text/plain\r\n"
+                b"Content-Length: " + str(len(ua)).encode() 
+                b"\r\n\r\n" + ua.encode()
+            )
+        else:
+            writer.write(b"HTTP/1.1 404 Not Found\r\n\r\n")
+        await writer.drain()
     except (asyncio.IncompleteReadError, ConnectionResetError):
         pass
     finally:
