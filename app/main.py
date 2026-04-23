@@ -25,8 +25,11 @@ def parse_request(data: str):
     return method, path, headers, body
 
 
-def handle_root(writer: asyncio.StreamWriter) -> None:
-    writer.write(b"HTTP/1.1 200 OK\r\n\r\n")
+def handle_root(alive: bool, writer: asyncio.StreamWriter) -> None:
+    if !alive:
+        writer.write(b"HTTP/1.1 200 OK\r\n\r\nConnection: close")
+    else:
+        writer.write(b"HTTP/1.1 200 OK\r\n\r\n")
 
 
 def handle_echo(path: str, encoding: bool, writer: asyncio.StreamWriter) -> None:
@@ -34,7 +37,7 @@ def handle_echo(path: str, encoding: bool, writer: asyncio.StreamWriter) -> None
     response = (
         b"HTTP/1.1 200 OK\r\n"
         b"Content-Type: text/plain\r\n"
-    )
+    )    
     if encoding:        
         response += b"Content-Encoding: gzip\r\nContent-Length: " + str(len(gzip.compress(body.encode()))).encode() + b"\r\n\r\n" + gzip.compress(body.encode())        
     else:
@@ -96,7 +99,7 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
 
             # Routing
             if path == "/":
-                handle_root(writer)
+                handle_root(keep_alive, writer)
 
             elif parts[0] == "echo" and len(parts) > 1:
                 accept_encoding = headers.get("accept-encoding", "")
