@@ -1,5 +1,6 @@
 import socket  # noqa: F401
 import asyncio
+from pathlib import Path
 
 HOST = "localhost"
 PORT = 4221
@@ -33,7 +34,16 @@ def handle_user_agent(headers: list[str], writer: asyncio.StreamWriter) -> None:
     
 def handle_files(file: str, writer: asyncio.StreamWriter) -> None:
     with open(f"/{sys.argv[2]}/{path[2]}", "r") as file:
-            content = file.read()
+        content = file.read()
+        response = (
+        b"HTTP/1.1 200 OK\r\n"
+        b"Content-Type: application/octet-stream\r\n"
+        b"Content-Length: " + str(len(content)).encode() + b"\r\n\r\n" +
+        content.encode()
+    )
+    writer.write(response)
+        
+            
 
 
 def handle_404(writer: asyncio.StreamWriter) -> None:
