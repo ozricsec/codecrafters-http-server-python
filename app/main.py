@@ -75,6 +75,7 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
 
         path = data.split(" ")[1]
         headers = data.split("\r\n")
+        print(headers)
 
         # Routing
         if path == "/":
@@ -89,7 +90,7 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
         elif path.split("/")[1] == "files" and data.split(" ")[0] == "POST":
             file_path = Path(sys.argv[2]) / path.split("/")[2]
             print(headers)
-            handle_post_files(path.split("/")[2], , writer)
+            handle_post_files(path.split("/")[2], writer)
         else:
             handle_404(writer)
 
