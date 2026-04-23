@@ -12,7 +12,6 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
             data = byte_data.decode("utf-8")
             if not data:
                 break
-            print(data)
             path = data.split(" ")[1]
             headers = data.split("\r\n")
             if path == "/":
