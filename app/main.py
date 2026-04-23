@@ -105,6 +105,10 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
                 connection = headers.get("connection", "").lower()
                 keep_alive = connection != "close"
                 handle_root(keep_alive, writer)
+                
+                await writer.drain()
+                if not keep_alive:
+                    break
 
             elif parts[0] == "echo" and len(parts) > 1:
                 accept_encoding = headers.get("accept-encoding", "")
