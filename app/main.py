@@ -6,7 +6,14 @@ def main():
     server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
     while True:
         client, _ = server_socket.accept()
-        client.send("HTTP/1.1 200 OK\r\n\r\n".encode())
+        
+        data = client.recv(4096).decode("utf-8")
+        path = data.split(" ")[1]
+        
+        if path == "/":
+            client.send("HTTP/1.1 200 OK\r\n\r\n".encode())
+        else:
+            client.send("HTTP/1.1 404 Not Found\r\n\r\n".encode())
     
 
 
