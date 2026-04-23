@@ -27,7 +27,10 @@ def parse_request(data: str):
 
 def handle_root(alive: bool, writer: asyncio.StreamWriter) -> None:
     if  not alive:
-        writer.write(b"HTTP/1.1 200 OK\r\n\r\nConnection: close")
+        writer.write(
+            b"HTTP/1.1 200 OK\r\n"
+            b"Connection: close\r\n\r\n"
+        )
     else:
         writer.write(b"HTTP/1.1 200 OK\r\n\r\n")
 
