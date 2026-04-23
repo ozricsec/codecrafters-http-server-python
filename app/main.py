@@ -17,7 +17,7 @@ def main():
             body = path.split("/")[-1]
             client.send(f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(body)}\r\n\r\n{body}".encode())
         if path.split("/")[1] == "user-agent":
-            ua = headers[2][:12]
+            ua = headers[2][12:]
             print(ua)
             client.send(f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(ua)}\r\n\r\n{ua}".encode())
         else:
