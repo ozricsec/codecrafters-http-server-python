@@ -45,7 +45,7 @@ def handle_files(filename: str, writer: asyncio.StreamWriter) -> None:
         b"Content-Length: " + str(len(content)).encode() + b"\r\n\r\n" +
         content
     )
-    writer.write(response))
+    writer.write(response)
         
             
 
