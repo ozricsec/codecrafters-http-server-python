@@ -29,9 +29,14 @@ def handle_user_agent(headers: list[str], writer: asyncio.StreamWriter) -> None:
         ua.encode()
     )
     writer.write(response)
+    
+    
+def handle_files(file: str, writer: asyncio.StreamWriter) -> None:
+    with open(f"/{sys.argv[2]}/{path[2]}", "r") as file:
+            content = file.read()
 
 
-def handle_not_found(writer: asyncio.StreamWriter) -> None:
+def handle_404(writer: asyncio.StreamWriter) -> None:
     writer.write(b"HTTP/1.1 404 Not Found\r\n\r\n")
 
 
@@ -55,8 +60,10 @@ async def client_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
             handle_echo(path, writer)
         elif path.split("/")[1] == "user-agent":
             handle_user_agent(headers, writer)
+        elif path.split("/")[1] == "files" and Path(f"/{sys.argv[2]}/{path.split('/'[2])}").exists():
+            handle_files(file, writer)
         else:
-            handle_not_found(writer)
+            handle_404(writer)
 
         await writer.drain()
 
